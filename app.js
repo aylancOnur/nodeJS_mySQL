@@ -7,7 +7,7 @@ const router = express.Router();
 const connection = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "Your Password",
+  password: "Your DB Password",
   waitForConnections: true,
   pool: 5,
   charset: "UTF8_GENERAL_CI",
@@ -94,6 +94,21 @@ const getAllRelationsById = (id) => {
   });
 };
 
+const updateById = (user_id, social_media_id, social_media_name) => {
+  const query =
+    "UPDATE social_media SET social_media_name = ? WHERE user_id = ? AND social_media_id = ?";
+  connection.query(
+    query,
+    [social_media_name, user_id, social_media_id],
+    (err, result) => {
+      if (err) {
+        console.log("err", err);
+      }
+      console.log("result", result);
+    }
+  );
+};
+
 connection.connect((err) => {
   if (err) {
     console.log("Error", err);
@@ -103,6 +118,7 @@ connection.connect((err) => {
   // createSocialMediaUser();
   // getAllRelationsData();
   // getAllRelationsById(4);
+  // updateById(4, 5, "TWITTER");
 });
 
 app.use(router);
