@@ -33,7 +33,7 @@ const createOneToManyTable = () => {
             (social_media_id INT AUTO_INCREMENT PRIMARY KEY,
             user_id INT NOT NULL,
             social_media_name VARCHAR(100),
-            FOREIGN KEY (user_id) REFERENCES users(user_id)
+            FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
             )
             `,
         (err,
@@ -52,7 +52,7 @@ const createOneToManyTable = () => {
 
 const createUser = () => {
   const query =
-    "INSERT INTO users (user_name,user_surname) VALUES ('user_name3','user_surname3')";
+    "INSERT INTO users (user_name,user_surname) VALUES ('user_name5','user_surname5)";
   connection.query(query, (err, result) => {
     if (err) {
       console.log("err", err);
@@ -63,7 +63,7 @@ const createUser = () => {
 
 const createSocialMediaUser = () => {
   const query =
-    "INSERT INTO social_media (user_id,social_media_name) VALUES ('4','INSTAGRAM')";
+    "INSERT INTO social_media (user_id,social_media_name) VALUES ('5','PINTEREST')";
   connection.query(query, (err, result) => {
     if (err) {
       console.log("err", err);
@@ -109,16 +109,27 @@ const updateById = (user_id, social_media_id, social_media_name) => {
   );
 };
 
+const deleteById = (id) => {
+  const query = "DELETE FROM users WHERE user_id = ?";
+  connection.query(query, [id], (err, result) => {
+    if (err) {
+      console.log("err", err);
+    }
+    console.log("result", result);
+  });
+};
+
 connection.connect((err) => {
   if (err) {
     console.log("Error", err);
   }
-  // createOneToManyTable();
-  // createUser();
-  // createSocialMediaUser();
+//   createOneToManyTable();
+//   createUser();
+//   createSocialMediaUser();
   // getAllRelationsData();
   // getAllRelationsById(4);
   // updateById(4, 5, "TWITTER");
+  deleteById(5);
 });
 
 app.use(router);
