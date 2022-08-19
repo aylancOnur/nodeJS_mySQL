@@ -143,6 +143,16 @@ const updateById = (tagId, postId, oldTagId) => {
   });
 };
 
+const deleteById = (postId, tagId) => {
+  const query = "DELETE FROM post_tag WHERE post_id = ? AND tag_id = ?";
+  connection.query(query, [postId, tagId], (err, result) => {
+    if (err) {
+      console.log("err", err);
+    }
+    console.log("result", result);
+  });
+};
+
 connection.connect((err) => {
   if (err) {
     console.log("Error", err);
@@ -158,7 +168,9 @@ connection.connect((err) => {
   //   tag: [7, 8],
   // });
   // getAllRelationsData();
-  updateById(13,3,9);
+  // updateById(13,3,9);
+  // getAllRelationsData();
+  deleteById(3, 7);
   getAllRelationsData();
 });
 
