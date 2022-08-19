@@ -17,34 +17,48 @@ const connection = mysql.createConnection({
   database: "educationdb",
 });
 
-const createOneToOneTable = () => {
+const createManyToManyTable = () => {
   const query = `
-      CREATE TABLE IF NOT EXISTS employee_cv
-      (
-        employee_cv_id INT AUTO_INCREMENT PRIMARY KEY,
-        employee_cv_name VARCHAR(100)
-      )
-      `;
+        CREATE TABLE IF NOT EXISTS post
+        (
+          post_id INT AUTO_INCREMENT PRIMARY KEY,
+          post_name VARCHAR(100)
+        )
+        `;
   connection.query(query, (err, result) => {
     if (!err) {
       connection.query(
         `
-              CREATE TABLE IF NOT EXISTS employee
-              (
-                employee_id INT AUTO_INCREMENT PRIMARY KEY,
-                employee_cv_id INT NOT NULL,
-                employee_name VARCHAR(100),
-                employee_surname VARCHAR(100),
-                employee_salary VARCHAR(100),
-                FOREIGN KEY (employee_cv_id) REFERENCES employee_cv(employee_cv_id) ON DELETE CASCADE
-              )
-              `,
+                CREATE TABLE IF NOT EXISTS tag
+                (
+                  tag_id INT AUTO_INCREMENT PRIMARY KEY,
+                  tag_name VARCHAR(100)
+                )
+                `,
         (err,
         (result) => {
           if (err) {
             console.log("ERR =>", err);
           }
-          console.log("RESULT => ", result);
+          connection.query(
+            `
+                    CREATE TABLE IF NOT EXISTS post_tag
+                    (
+                      post_tag_id INT AUTO_INCREMENT PRIMARY KEY,
+                      post_id INT NOT NULL,
+                      tag_id INT NOT NULL,
+                      FOREIGN KEY (post_id) REFERENCES post(post_id) ON DELETE CASCADE,
+                      FOREIGN KEY (tag_id) REFERENCES tag(tag_id) ON DELETE CASCADE
+                    )
+                    `,
+            (err,
+            (result) => {
+              if (err) {
+                console.log("ERR =>", err);
+              }
+              console.log("RESULT => ", result);
+            })
+          );
         })
       );
     } else {
@@ -53,57 +67,46 @@ const createOneToOneTable = () => {
   });
 };
 
-const createEmployeeCV = () => {
-  const query =
-    "INSERT INTO employee_cv (employee_cv_name) VALUES ('employee_cv_name2')";
-  connection.query(query, (err, result) => {
+const createPost = (data) => {
+  const query = "INSERT INTO post (post_name) VALUES (?)";
+  connection.query(query, [data.post_name], (err, result) => {
     if (err) {
       console.log("err", err);
     }
-    console.log("result", result);
+
+    const post_id = result.insertId;
+
+    for (let index = 0; index < data.tag.length; index++) {
+      const query = "INSERT INTO tag (tag_name) VALUES (?)";
+      connection.query(query, [data.tag[index]], (err, result) => {
+        console.log("Tag =>", result);
+        const query = "INSERT INTO post_tag (post_id,tag_id) VALUES (?,?)";
+        connection.query(query, [post_id, result.insertId], (err, result) => {
+          console.log("Post tag =>", result);
+          console.log("Post tag err =>", err);
+        });
+      });
+    }
   });
 };
 
-const createEmployee = () => {
-  const query =
-    "INSERT INTO employee (employee_cv_id,employee_name,employee_surname,employee_salary) VALUES ('2','employee_name2','employee_surname2','5500')";
-  connection.query(query, (err, result) => {
+const createOtherPost = (data) => {
+  const query = "INSERT INTO post (post_name) VALUES (?)";
+  connection.query(query, [data.post_name], (err, result) => {
     if (err) {
       console.log("err", err);
     }
-    console.log("result", result);
-  });
-};
 
-const getAllRelationsData = () => {
-  const query =
-    "SELECT * FROM employee_cv AS c INNER JOIN employee AS e ON c.employee_cv_id = e.employee_cv_id";
-  connection.query(query, (err, result) => {
-    if (err) {
-      console.log("err", err);
-    }
-    console.log("result", result);
-  });
-};
+    const post_id = result.insertId;
 
-const updateById = (employee_cv_name, employee_cv_id) => {
-  const query =
-    "UPDATE employee_cv SET employee_cv_name = ? WHERE employee_cv_id = ?";
-  connection.query(query, [employee_cv_name, employee_cv_id], (err, result) => {
-    if (err) {
-      console.log("err", err);
+    for (let index = 0; index < data.tag.length; index++) {
+      console.log("Tag =>", result);
+      const query = "INSERT INTO post_tag (post_id,tag_id) VALUES (?,?)";
+      connection.query(query, [post_id, data.tag[index]], (err, result) => {
+        console.log("Post tag =>", result);
+        console.log("Post tag err =>", err);
+      });
     }
-    console.log("result", result);
-  });
-};
-
-const deleteById = (id) => {
-  const query = "DELETE FROM employee_cv WHERE employee_cv_id = ?";
-  connection.query(query, [id], (err, result) => {
-    if (err) {
-      console.log("err", err);
-    }
-    console.log("result", result);
   });
 };
 
@@ -112,14 +115,15 @@ connection.connect((err) => {
     console.log("Error", err);
   }
   console.log("Connected");
-  // createOneToOneTable();
-  // createEmployeeCV();
-  // createEmployee()
-  // getAllRelationsData();
-  // updateById("updated_cv_name",2)
-  // getAllRelationsData();
-  deleteById(2);
-  getAllRelationsData();
+  // createManyToManyTable();
+  // createPost({
+  //   post_name: "post_2",
+  //   tag: ["#trip", "#funny", "#food"],
+  // });
+  createOtherPost({
+    post_name: "post_2",
+    tag: [7, 8],
+  });
 });
 
 app.use(router);
