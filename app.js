@@ -132,6 +132,17 @@ const getAllRelationsData = () => {
   });
 };
 
+const updateById = (tagId, postId, oldTagId) => {
+  const query =
+    "UPDATE post_tag SET tag_id = ? WHERE post_id = ? AND tag_id = ?";
+  connection.query(query, [tagId, postId, oldTagId], (err, result) => {
+    if (err) {
+      console.log("err", err);
+    }
+    console.log("result", result);
+  });
+};
+
 connection.connect((err) => {
   if (err) {
     console.log("Error", err);
@@ -146,6 +157,8 @@ connection.connect((err) => {
   //   post_name: "post_2",
   //   tag: [7, 8],
   // });
+  // getAllRelationsData();
+  updateById(13,3,9);
   getAllRelationsData();
 });
 
