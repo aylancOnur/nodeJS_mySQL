@@ -110,6 +110,28 @@ const createOtherPost = (data) => {
   });
 };
 
+const getAllRelationsData = () => {
+  const query = `SELECT * FROM post_tag AS pt 
+    INNER JOIN post AS p ON p.post_id = pt.post_id
+    INNER JOIN tag AS t ON t.tag_id = pt.tag_id
+    WHERE pt.post_id = 3
+    `;
+  connection.query(query, (err, result) => {
+    if (err) {
+      console.log("err", err);
+    }
+    console.log("result", result);
+    const post = {};
+    const tags = [];
+    for (let index = 0; index < result.length; index++) {
+      tags.push(result[index].tag_name);
+    }
+    post.post_name = result[0].post_name;
+    post.tags = tags;
+    console.log("post =>", post);
+  });
+};
+
 connection.connect((err) => {
   if (err) {
     console.log("Error", err);
@@ -120,10 +142,11 @@ connection.connect((err) => {
   //   post_name: "post_2",
   //   tag: ["#trip", "#funny", "#food"],
   // });
-  createOtherPost({
-    post_name: "post_2",
-    tag: [7, 8],
-  });
+  // createOtherPost({
+  //   post_name: "post_2",
+  //   tag: [7, 8],
+  // });
+  getAllRelationsData();
 });
 
 app.use(router);
