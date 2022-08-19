@@ -97,6 +97,16 @@ const updateById = (employee_cv_name, employee_cv_id) => {
   });
 };
 
+const deleteById = (id) => {
+  const query = "DELETE FROM employee_cv WHERE employee_cv_id = ?";
+  connection.query(query, [id], (err, result) => {
+    if (err) {
+      console.log("err", err);
+    }
+    console.log("result", result);
+  });
+};
+
 connection.connect((err) => {
   if (err) {
     console.log("Error", err);
@@ -106,10 +116,10 @@ connection.connect((err) => {
   // createEmployeeCV();
   // createEmployee()
   // getAllRelationsData();
-  updateById("updated_cv_name",2)
+  // updateById("updated_cv_name",2)
+  // getAllRelationsData();
+  deleteById(2);
   getAllRelationsData();
-
-
 });
 
 app.use(router);
