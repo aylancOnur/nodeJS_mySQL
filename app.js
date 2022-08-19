@@ -53,12 +53,48 @@ const createOneToOneTable = () => {
   });
 };
 
+const createEmployeeCV = () => {
+  const query =
+    "INSERT INTO employee_cv (employee_cv_name) VALUES ('employee_cv_name2')";
+  connection.query(query, (err, result) => {
+    if (err) {
+      console.log("err", err);
+    }
+    console.log("result", result);
+  });
+};
+
+const createEmployee = () => {
+  const query =
+    "INSERT INTO employee (employee_cv_id,employee_name,employee_surname,employee_salary) VALUES ('2','employee_name2','employee_surname2','5500')";
+  connection.query(query, (err, result) => {
+    if (err) {
+      console.log("err", err);
+    }
+    console.log("result", result);
+  });
+};
+
+const getAllRelationsData = () => {
+  const query =
+    "SELECT * FROM employee_cv AS c INNER JOIN employee AS e ON c.employee_cv_id = e.employee_cv_id";
+  connection.query(query, (err, result) => {
+    if (err) {
+      console.log("err", err);
+    }
+    console.log("result", result);
+  });
+};
+
 connection.connect((err) => {
   if (err) {
     console.log("Error", err);
   }
   console.log("Connected");
-  createOneToOneTable();
+  // createOneToOneTable();
+  // createEmployeeCV();
+  // createEmployee()
+  getAllRelationsData();
 });
 
 app.use(router);
