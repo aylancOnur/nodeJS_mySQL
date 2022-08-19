@@ -86,6 +86,17 @@ const getAllRelationsData = () => {
   });
 };
 
+const updateById = (employee_cv_name, employee_cv_id) => {
+  const query =
+    "UPDATE employee_cv SET employee_cv_name = ? WHERE employee_cv_id = ?";
+  connection.query(query, [employee_cv_name, employee_cv_id], (err, result) => {
+    if (err) {
+      console.log("err", err);
+    }
+    console.log("result", result);
+  });
+};
+
 connection.connect((err) => {
   if (err) {
     console.log("Error", err);
@@ -94,7 +105,11 @@ connection.connect((err) => {
   // createOneToOneTable();
   // createEmployeeCV();
   // createEmployee()
+  // getAllRelationsData();
+  updateById("updated_cv_name",2)
   getAllRelationsData();
+
+
 });
 
 app.use(router);
