@@ -153,6 +153,46 @@ const deleteById = (postId, tagId) => {
   });
 };
 
+const createWithTransaction = (data) => {
+  const query = "INSERT INTO post (post_name) VALUES (?)";
+  connection.beginTransaction();
+  connection.query(query, [data.post_name], (err, result) => {
+    if (err) {
+      console.log("err", err);
+      connection.rollback();
+      connection.end();
+      return;
+    }
+
+    const post_id = result.insertId;
+
+    for (let index = 0; index < data.tag.length; index++) {
+      const query = "INSERT INTO tag (tag_name) VALUES (?)";
+      connection.query(query, [data.tag[index]], (err, result) => {
+        if (err) {
+          console.log("err", err);
+          connection.rollback();
+          connection.end();
+          return;
+        }
+        console.log("Tag =>", result);
+        const query = "INSERT INTO post_tag (post_id,tag_id) VALUES (?,?)";
+        connection.query(query, [post_id, result.insertId], (err, result) => {
+          if (err) {
+            console.log("Post tag err =>", err);
+            connection.rollback();
+            connection.end();
+            return;
+          }
+          connection.commit();
+          // connection.end();
+          console.log("Post tag =>", result);
+        });
+      });
+    }
+  });
+};
+
 connection.connect((err) => {
   if (err) {
     console.log("Error", err);
@@ -170,8 +210,12 @@ connection.connect((err) => {
   // getAllRelationsData();
   // updateById(13,3,9);
   // getAllRelationsData();
-  deleteById(3, 7);
-  getAllRelationsData();
+  // deleteById(3, 7);
+  // getAllRelationsData();
+  createWithTransaction({
+    post_name: "post_3",
+    tag: ["#adventure", "#fly", "#sport"],
+  });
 });
 
 app.use(router);
